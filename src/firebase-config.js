@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -13,12 +13,12 @@ const firebaseConfig = {
   projectId: "chat-a23db",
   storageBucket: "chat-a23db.appspot.com",
   messagingSenderId: "368110679438",
-  appId: "1:368110679438:web:b62c6c194b4b5be979a0df",
-  measurementId: "G-18YSLBDJTS"
+  appId: "1:368110679438:web:1aa9882a28cb6d3679a0df",
+  measurementId: "G-YTFL5XWH1X"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
-const analytics = getAnalytics(app);
+export const db = getFirestore(app)
