@@ -9,8 +9,14 @@ const cookies = new Cookies();
 
 function ChatApp() {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
-  const [isInChat, setIsInChat] = useState(null);
+  const [isInChat, setIsInChat] = useState(false);
   const [room, setRoom] = useState("");
+
+  useEffect(() => {
+    console.log("isAuth:", isAuth);
+    console.log("isInChat:", isInChat);
+    console.log("room:", room);
+  }, [isAuth, isInChat, room]);
 
   if (!isAuth) {
     return (
@@ -29,9 +35,16 @@ function ChatApp() {
       {!isInChat ? (
         <div className="room">
           <label> Type room name: </label>
-          <input onChange={(e) => setRoom(e.target.value)} />
+          <input
+            onChange={(e) => setRoom(e.target.value)}
+            placeholder="Enter room name"
+          />
           <button
             onClick={() => {
+              if (room.trim() === "") {
+                alert("Please enter a room name.");
+                return;
+              }
               setIsInChat(true);
             }}
           >

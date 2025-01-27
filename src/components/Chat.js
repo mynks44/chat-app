@@ -15,34 +15,40 @@ import "../styles/Chat.css";
 export const Chat = ({ room }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const messagesRef = collection(db, "messages");
 
   useEffect(() => {
+    const messagesRef = collection(db, "messages");
+
     const queryMessages = query(
       messagesRef,
       where("room", "==", room),
       orderBy("createdAt")
     );
-    const unsuscribe = onSnapshot(queryMessages, (snapshot) => {
+
+    const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
       let messages = [];
       snapshot.forEach((doc) => {
         messages.push({ ...doc.data(), id: doc.id });
       });
-      console.log(messages);
       setMessages(messages);
     });
 
-    return () => unsuscribe();
-  }, []);
+    return () => unsubscribe();
+  }, [room]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (newMessage === "") return;
+    if (newMessage.trim() === "") return;
+
+    const currentUser = auth.currentUser;
+    if (!currentUser || !currentUser.displayName) return;
+
+    const messagesRef = collection(db, "messages");
     await addDoc(messagesRef, {
       text: newMessage,
       createdAt: serverTimestamp(),
-      user: auth.currentUser.displayName,
+      user: currentUser.displayName,
       room,
     });
 
