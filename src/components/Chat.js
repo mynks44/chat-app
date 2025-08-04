@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { db, auth } from "../firebase-config";
+import { db } from "../firebase-config";
 import {
   collection,
   addDoc,
@@ -9,10 +9,9 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-
 import "../styles/Chat.css";
 
-export const Chat = ({ room }) => {
+export const Chat = ({ room, username }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -22,15 +21,18 @@ export const Chat = ({ room }) => {
     const queryMessages = query(
       messagesRef,
       where("room", "==", room),
-      orderBy("createdAt")
+      orderBy("createdAt", "asc") // safer, explicit ascending order
     );
 
     const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
-      let messages = [];
+      const loadedMessages = [];
       snapshot.forEach((doc) => {
-        messages.push({ ...doc.data(), id: doc.id });
+        const data = doc.data();
+        if (data.text && data.user && data.createdAt) {
+          loadedMessages.push({ ...data, id: doc.id });
+        }
       });
-      setMessages(messages);
+      setMessages(loadedMessages);
     });
 
     return () => unsubscribe();
@@ -39,16 +41,14 @@ export const Chat = ({ room }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (newMessage.trim() === "") return;
-
-    const currentUser = auth.currentUser;
-    if (!currentUser || !currentUser.displayName) return;
+    if (!username || newMessage.trim() === "") return;
 
     const messagesRef = collection(db, "messages");
+
     await addDoc(messagesRef, {
       text: newMessage,
-      createdAt: serverTimestamp(),
-      user: currentUser.displayName,
+      createdAt: serverTimestamp(), // use new Date() for temporary workaround if needed
+      user: username,
       room,
     });
 
@@ -60,6 +60,7 @@ export const Chat = ({ room }) => {
       <div className="header">
         <h1>Welcome to: {room.toUpperCase()}</h1>
       </div>
+
       <div className="messages">
         {messages.map((message) => (
           <div key={message.id} className="message">
@@ -67,6 +68,7 @@ export const Chat = ({ room }) => {
           </div>
         ))}
       </div>
+
       <form onSubmit={handleSubmit} className="new-message-form">
         <input
           type="text"

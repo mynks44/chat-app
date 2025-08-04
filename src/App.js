@@ -4,11 +4,15 @@ import { Auth } from "./components/Auth.js";
 import { AppWrapper } from "./components/AppWrapper";
 import Cookies from "universal-cookie";
 import "./App.css";
-
+import { auth } from "./firebase-config";
+import { signOut } from "firebase/auth";
 const cookies = new Cookies();
 
 function ChatApp() {
-  const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
+  const [isAuth, setIsAuth] = useState(
+    cookies.get("auth-token") || cookies.get("guest-name")
+  );
+  const [guestName, setGuestName] = useState(cookies.get("guest-name") || "");
   const [isInChat, setIsInChat] = useState(false);
   const [room, setRoom] = useState("");
 
@@ -25,7 +29,7 @@ function ChatApp() {
         setIsAuth={setIsAuth}
         setIsInChat={setIsInChat}
       >
-        <Auth setIsAuth={setIsAuth} />
+        <Auth setIsAuth={setIsAuth} setGuestName={setGuestName} />
       </AppWrapper>
     );
   }
@@ -52,10 +56,16 @@ function ChatApp() {
           </button>
         </div>
       ) : (
-        <Chat room={room} />
+        <Chat
+          room={room}
+          username={
+            cookies.get("guest-name") ||
+            auth.currentUser?.displayName ||
+            "Unknown User"
+          }
+        />
       )}
     </AppWrapper>
   );
 }
-
 export default ChatApp;
