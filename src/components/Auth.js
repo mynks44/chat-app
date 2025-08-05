@@ -25,24 +25,31 @@ export const Auth = ({ setIsAuth, setGuestName }) => {
       setGuestName(guestInput);
       setIsAuth(true);
     } else {
-      alert("Please enter a name to continue as guest.");
+      alert("Please provide a name to proceed as a guest.");
     }
   };
 
   return (
     <div className="auth">
-      <p>Sign in with Google or continue as Guest</p>
+      <h2>Welcome to Our Platform</h2>
+      <p>Please sign in using Google or continue as a guest.</p>
 
-      <button onClick={signInWithGoogle}>Sign In with Google</button>
+      <button className="google-login" onClick={signInWithGoogle}>
+        Sign In with Google
+      </button>
 
       <div className="guest-login">
+        <p>Or, continue as a guest:</p>
         <input
           type="text"
-          placeholder="Enter name to continue as guest"
+          placeholder="Enter your name"
           value={guestInput}
           onChange={(e) => setGuestInput(e.target.value)}
+          className="guest-input"
         />
-        <button onClick={continueAsGuest}>Continue as Guest</button>
+        <button className="guest-login-button" onClick={continueAsGuest}>
+          Continue as Guest
+        </button>
       </div>
     </div>
   );

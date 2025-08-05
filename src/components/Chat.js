@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import "../styles/Chat.css";
 
-export const Chat = ({ room, username }) => {
+export const Chat = ({ room, username, backgroundImage }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -21,7 +21,7 @@ export const Chat = ({ room, username }) => {
     const queryMessages = query(
       messagesRef,
       where("room", "==", room),
-      orderBy("createdAt", "asc") // safer, explicit ascending order
+      orderBy("createdAt", "asc")
     );
 
     const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
@@ -47,7 +47,7 @@ export const Chat = ({ room, username }) => {
 
     await addDoc(messagesRef, {
       text: newMessage,
-      createdAt: serverTimestamp(), // use new Date() for temporary workaround if needed
+      createdAt: serverTimestamp(),
       user: username,
       room,
     });
@@ -56,31 +56,42 @@ export const Chat = ({ room, username }) => {
   };
 
   return (
-    <div className="chat-app">
-      <div className="header">
-        <h1>Welcome to: {room.toUpperCase()}</h1>
-      </div>
+    <div
+      className="chat-app"
+      style={{
+        backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+        padding: "1rem",
+      }}
+    >
+      <div className="chat-box">
+        <div className="header">
+          <h1>Welcome to: {room.toUpperCase()}</h1>
+        </div>
 
-      <div className="messages">
-        {messages.map((message) => (
-          <div key={message.id} className="message">
-            <span className="user">{message.user}:</span> {message.text}
-          </div>
-        ))}
-      </div>
+        <div className="messages">
+          {messages.map((message) => (
+            <div key={message.id} className="message">
+              <span className="user">{message.user}:</span> {message.text}
+            </div>
+          ))}
+        </div>
 
-      <form onSubmit={handleSubmit} className="new-message-form">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(event) => setNewMessage(event.target.value)}
-          className="new-message-input"
-          placeholder="Type your message here..."
-        />
-        <button type="submit" className="send-button">
-          Send
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="new-message-form">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(event) => setNewMessage(event.target.value)}
+            className="new-message-input"
+            placeholder="Type your message here..."
+          />
+          <button type="submit" className="send-button">
+            Send
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
